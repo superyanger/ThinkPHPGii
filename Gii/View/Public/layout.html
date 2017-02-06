@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>『有主机上线』后台管理</title>
+    <link rel="stylesheet" type="text/css" href="{$smarty.const.ADMIN_PUB}css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="{$smarty.const.ADMIN_PUB}css/main.css"/>
+    <script src="{$smarty.const.PUB}js/jquery.min.js"></script>
+    <script type="text/javascript" src="{$smarty.const.ADMIN_PUB}js/libs/modernizr.min.js"></script>
+</head>
+<body>
+<div class="topbar-wrap white">
+    <div class="topbar-inner clearfix">
+        <div class="topbar-logo-wrap clearfix">
+            <ul class="navbar-list clearfix">
+                <li><a class="on" href="{$smarty.const.__MODULE__}">首页</a></li>
+                <li><a href="{$smarty.const.BASE}" target="_blank">网站首页</a></li>
+            </ul>
+        </div>
+        <div class="top-info-wrap">
+            <ul class="top-info-list clearfix">
+                <li>{$smarty.session.aname}</li>
+                <li><a href="{$smarty.const.__MODULE__}/Admin/changePassword">修改密码</a></li>
+                <li><a href="{$smarty.const.__MODULE__}/Admin/logout">退出</a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="container clearfix">
+    <div class="sidebar-wrap">
+        <div class="sidebar-title">
+            <h1>菜单</h1>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-list">
+                <li>
+                    <a href="#"><i class="icon-font">&#xe003;</i>常用操作</a>
+                    <ul class="sub-menu">
+                        {foreach $aData as $v}
+                        <li><a href="{$smarty.const.__MODULE__}/{$v.controller}"><i class="icon-font">&#xe008;</i>{$v.name}</a></li>
+                        {/foreach}
+                    </ul>
+                </li>
+                <li>
+                    <a href="#"><i class="icon-font">&#xe018;</i>系统管理</a>
+                    <ul class="sub-menu">
+                        <li><a href="{$smarty.const.__MODULE__}/Auth"><i class="icon-font">&#xe017;</i>权限管理</a></li>
+                        <li><a href="{$smarty.const.__MODULE__}/Role"><i class="icon-font">&#xe017;</i>角色管理</a></li>
+                        <li><a href="{$smarty.const.__MODULE__}/Admin"><i class="icon-font">&#xe017;</i>管理员列表</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+    <!--/sidebar-->
+    <div class="main-wrap">
+        {block name="main"}{/block}
+    </div>
+    <!--/main-->
+</div>
+</body>
+</html>

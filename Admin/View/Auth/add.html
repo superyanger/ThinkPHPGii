@@ -1,0 +1,115 @@
+{extends file="Admin/View/Public/layout.html"}
+{block name="main"}
+<div class="crumb-wrap">
+    <div class="crumb-list">
+        <i class="icon-font"></i>
+        <a href="{$smarty.const.__MODULE__}">首页</a>
+        <span class="crumb-step">&gt;</span>
+        <a class="crumb-name" href="{$smarty.const.__CONTROLLER__}/index">{$tcname}管理</a>
+        <span class="crumb-step">&gt;</span>
+        <span class="crumb-name">添加</span>
+    </div>
+</div>
+<div class="result-wrap">
+    <div class="result-content">
+        <form action="{$smarty.const.__ACTION__}" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="_csrf" value="{$smarty.session.csrf}">
+            <table class="insert-tab" width="100%">
+                <tbody>
+                                                                                                    
+                    <tr>
+                        <th width="20%" valign="top">
+                                                        
+                            <i class="require-red">*</i>
+                                                                                    
+                            名称：
+                                                    
+                        </th>
+                        <td>
+                                                        
+                            <input type="text" name="name" id="name" class="common-text" value="{setValue('name')}">
+                                                        
+                            <div style="color: red">{$error.name}</div>
+                        </td>
+                    </tr>
+                                                                                
+                    <tr>
+                        <th width="20%" valign="top">
+                                                                                    
+                            父权限：
+                                                    
+                        </th>
+                        <td>
+                                                        
+                            <select name="parent_id">
+                                <option value="">请选择</option>
+                                {foreach $cData as $v2}
+                                <option value="{$v2.id}" {setSelectValue($v2.id,'parent_id')}>{str_repeat('-', $v2.level * 8)}{$v2.name}</option>
+                                {/foreach}
+                            </select>
+                                                        
+                            <div style="color: red">{$error.parent_id}</div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th width="20%" valign="top">
+
+                            控制器：
+
+                        </th>
+                        <td>
+
+                            <input type="text" name="controller" id="controller" class="common-text" value="{setValue('controller')}">
+                            <div>最多只能有一个控制器</div>
+                            <div style="color: red">{$error.controller}</div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th width="20%" valign="top">
+
+                            方法：
+
+                        </th>
+                        <td>
+
+                            <input type="text" name="action" id="action" class="common-text" value="{setValue('action')}">
+                            <div>多个之间请用，隔开</div>
+                            <div style="color: red">{$error.action}</div>
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <th width="20%" valign="top">
+                                                                                    
+                            排序：
+                                                    
+                        </th>
+                        <td>
+                                                        
+                            <input type="text" name="rank" id="rank" class="common-text" value="{setValue('rank')}">
+                                                        
+                            <div style="color: red">{$error.rank}</div>
+                        </td>
+                    </tr>
+                                                            
+                    <tr>
+                        <th></th>
+                        <td>
+                            <input class="btn btn-primary btn6 mr10" value="提交" type="submit">
+                            <input class="btn btn6" onclick='window.location.href = "{val(I('get.back'), '{$smarty.const.__CONTROLLER__}/index')}"' value="返回" type="button">
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </form>
+    </div>
+</div>
+
+
+
+<script>
+                                                            
+</script>
+{/block}

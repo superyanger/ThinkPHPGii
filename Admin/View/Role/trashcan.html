@@ -1,0 +1,221 @@
+{extends file="Admin/View/Public/layout.html"}
+{block name="main"}
+<div class="crumb-wrap">
+    <div class="crumb-list">
+        <i class="icon-font"></i>
+        <a href="{$smarty.const.__MODULE__}">首页</a>
+        <span class="crumb-step">&gt;</span>
+        <a class="crumb-name" href="{$smarty.const.__CONTROLLER__}/index">{$tcname}管理</a>
+        <span class="crumb-step">&gt;</span>
+        <span class="crumb-name">回收站</span>
+    </div>
+</div>
+<div class="result-wrap">
+    <form name="myform" id="myform" method="post">
+        <input id="_csrf" type="hidden" name="_csrf" value="{$smarty.session.csrf}">
+        <div class="result-title">
+            <div class="result-list">
+                <a href="{val(I('get.back'), '{$smarty.const.__CONTROLLER__}/index')}">返回</a>
+            </div>
+            <div class="result-list">
+                <input type="checkbox" id="all">全选
+                <a href="javascript:" onclick="recoverGroup()">批量还原</a>
+                <a href="javascript:" onclick="delGroup()">批量删除</a>
+            </div>
+        </div>
+        <div class="result-content">
+            <table class="result-tab" width="100%">
+                <tr>
+                    <th width="15"></th>
+                                                                                                    
+                    <th >名称</th>
+                                        
+                    <th width="20%">操作</th>
+                </tr>
+                {foreach $data as $v}
+                <tr id="row_{$v.id}" >
+                    <td><input type="checkbox" name="ids[]" value="{$v.id}" class="check-id" onclick="choose({$v.id}, this)"></td>
+                    <td >
+                                                
+                        {$v.name}
+                    </td>
+                    <td>
+                                                
+                        <a class="link-del" href="javascript:" onclick="recover({$v.id}, this)">还原</a>
+                                                
+                        <a class="link-del" href="javascript:" onclick="del({$v.id}, this)">删除</a>
+                    </td>
+                </tr>
+                {/foreach}
+            </table>
+            <div class="list-page">{$page}</div>
+        </div>
+    </form>
+</div>
+<script>
+    function recover(id, obj)
+    {
+        $.ajax({
+            method: "POST",
+            url: "{$smarty.const.__CONTROLLER__}/recover",
+            data: {
+                id: id,
+                _csrf: $("#_csrf").val()
+            },
+            dataType: "json",
+            success: function(data) {
+                if(data.status > 0) {
+                    alert("成功");
+                                        
+                    $(obj).parent().parent().remove();
+                                    
+                } else {
+                    alert("网络正在睡觉,请稍后再试");
+                }
+                $("#_csrf").val(data.csrf);
+            },
+            error: function(o, s, e) {
+                alert("网络正在睡觉,请稍后再试");
+            }
+        })
+    }
+
+    function del(id, obj)
+    {
+        if(confirm('确定要删除吗')) {
+            $.ajax({
+                method: "POST",
+                url: "{$smarty.const.__CONTROLLER__}/del",
+                data: {
+                    id: id,
+                    _csrf: $("#_csrf").val()
+                },
+                dataType: "json",
+                success: function(data) {
+                    if(data.status > 0) {
+                        alert("成功");
+                                                
+                        $(obj).parent().parent().remove();
+                    } else {
+                        alert("网络正在睡觉,请稍后再试");
+                    }
+                    $("#_csrf").val(data.csrf);
+                },
+                error: function(o, s, e) {
+                    alert("网络正在睡觉,请稍后再试");
+                }
+            })
+        }
+    }
+
+    function choose(id, obj)
+    {
+                
+        $("#all").prop("checked", canChooseAll());
+    }
+
+    
+    function canChooseAll()
+    {
+        var v = $(".check-id");
+        for(var i = 0; i < $(v).length; i++) {
+            if(!$(v).eq(i).prop("checked")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    $("#all").click(function() {
+        if($(this).prop("checked")) {
+            $(".check-id").prop("checked", true);
+        } else {
+            $(".check-id").prop("checked", false);
+        }
+    });
+
+    function recoverGroup()
+    {
+        if(!selectAny()) {
+            alert("没有选择任何行");
+            return;
+        }
+
+        var v = $(".check-id");
+        for(var i = 0; i < $(v).length; i++) {
+            var ck = $(v).eq(i);
+            var tr = $(ck).parent().parent();
+            var lev = $(tr).attr("level");
+            if($(ck).prop("checked") && lev > 0) {
+                $(tr).prevAll("tr").each(function(k, vv) {
+                    var vlev = $(vv).attr("level");
+                    if(vlev < lev) {
+                        $(vv).find(".check-id").prop("checked", true);
+                        lev = vlev;
+                    }
+                })
+            }
+        }
+
+        $.ajax({
+            method: "POST",
+            url: "{$smarty.const.__CONTROLLER__}/recovergroup",
+            data: $("#myform").serialize(),
+            dataType: "json",
+            success: function(data) {
+                if(data.status > 0) {
+                    alert("成功");
+                    window.location.reload(true);
+                } else {
+                    alert("网络正在睡觉,请稍后再试");
+                }
+                $("#_csrf").val(data.csrf);
+            },
+            error: function(o, s, e) {
+                alert("网络正在睡觉,请稍后再试");
+            }
+        })
+    }
+
+    function delGroup()
+    {
+        if(!selectAny()) {
+            alert("没有选择任何行");
+            return;
+        }
+        if(confirm("确定要删除吗")) {
+            $.ajax({
+                method: "POST",
+                url: "{$smarty.const.__CONTROLLER__}/delgroup",
+                data: $("#myform").serialize(),
+                dataType: "json",
+                success: function(data) {
+                    if(data.status > 0) {
+                        alert("成功");
+                        window.location.reload(true);
+                    } else {
+                        alert("网络正在睡觉,请稍后再试");
+                    }
+                    $("#_csrf").val(data.csrf);
+                },
+                error: function(o, s, e) {
+                    alert("网络正在睡觉,请稍后再试");
+                }
+            })
+        }
+    }
+
+    function selectAny()
+    {
+        var v = $(".check-id");
+        for (var i = 0; i < $(v).length; i++) {
+            if($(v).eq(i).prop("checked")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+</script>
+{/block}

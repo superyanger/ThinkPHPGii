@@ -1,0 +1,62 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>后台管理登陆</title>
+    <link href="{$smarty.const.ADMIN_PUB}css/admin_login.css" rel="stylesheet" type="text/css" />
+</head>
+<body>
+<div class="admin_login_wrap">
+    <h1>后台管理</h1>
+    <div class="adming_login_border">
+        <div class="admin_input">
+            <form method="post" action="">
+                <input type="hidden" name="_csrf" value="{$smarty.session.csrf}">
+                <table cellspacing="0" cellpadding="0" style="margin-top:100px" align="center">
+                    <tr>
+                        <td style="padding-left: 50px">
+                            <table>
+                                <tr>
+                                    <td valign="top">管理员姓名：</td>
+                                    <td>
+                                        <input type="text" name="name" value="{setValue('name')}">
+                                        <p style="color: red">{$error.name}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top">管理员密码：</td>
+                                    <td>
+                                        <input type="password" name="password">
+                                        <p style="color: red">{$error.password}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="top">验证码：</td>
+                                    <td>
+                                        <input type="text" name="captcha" maxlength="4" class="capital">
+                                        <p style="color: red">{$error.captcha}</p>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td colspan="2" align="right">
+                                        <img style="cursor:pointer;" onclick="this.src='{$smarty.const.__CONTROLLER__}/verify?'+Math.random()"
+                                             src="{$smarty.const.__CONTROLLER__}/verify">
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>&nbsp;</td>
+                                    <td>
+                                        <input type="submit" value="进入管理中心" class="button" />
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </form>
+        </div>
+    </div>
+    <p class="admin_copyright"><a tabindex="5" href="#">返回首页</a> &copy; 2014 Powered by <a href="http://jscss.me" target="_blank">有主机上线</a></p>
+</div>
+</body>
+</html>

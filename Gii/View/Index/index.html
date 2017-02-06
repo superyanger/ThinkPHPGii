@@ -1,0 +1,172 @@
+<!doctype html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>代码生成器</title>
+    <link rel="stylesheet" type="text/css" href="{$smarty.const.GII_PUB}css/common.css"/>
+    <link rel="stylesheet" type="text/css" href="{$smarty.const.GII_PUB}css/main.css"/>
+    <script src="{$smarty.const.PUB}js/jquery.min.js"></script>
+    <script type="text/javascript" src="{$smarty.const.GII_PUB}js/libs/modernizr.min.js"></script>
+</head>
+<body>
+    <div class="result-wrap">
+        <div class="result-title">
+            <div class="result-list">
+                <a href="{$smarty.const.__CONTROLLER__}/rabc">生成RABC</a>
+            </div>
+        </div>
+        <div class="result-content">
+            <form method="post" action="">
+                <input id="csrf" type="hidden" name="_csrf" value="{$smarty.session.csrf}">
+                <ul>
+                    <li>
+                        <p>表名</p>
+                        <input class="common-text" type="text" name="tname">
+                    </li>
+                    <li>
+                        <input type="checkbox" name="na" value="1" checked>name字段
+                    </li>
+                    <li>
+                        <input type="checkbox" name="rec" value="1">此表是无限分类
+                    </li>
+                    <li>
+                        <input type="checkbox" name="ks" value="1">关键词搜索
+                    </li>
+                    <li>
+                        <p>外键</p>
+                        <input class="common-text" type="text" name="fk">
+                        <p style="color: #999">多个外键请用&隔开</p>
+                    </li>
+                    <li>
+                        <p>此表主键作为外键的表</p>
+                        <input class="common-text" type="text" name="tfk">
+                        <p style="color: #999">多个表请用&隔开</p>
+                    </li>
+                    <li>
+                        <p>图集表</p>
+                        <input class="common-text" type="text" name="tiname">
+                    </li>
+                    <li>
+                        <input type="checkbox" name="ti" value="1">此表是图集表
+                    </li>
+                    <li>
+                        <p>扩展属性表</p>
+                        <input class="common-text" type="text" name="ext">
+                        <p style="color: #999">多个表请用&隔开</p>
+                    </li>
+                    <li>
+                        <p>和扩展属性表关联的属性表</p>
+                        <input class="common-text" type="text" name="at">
+                        <p style="color: #999">多个表请用&隔开,顺序和扩展属性表的顺序对应</p>
+                    </li>
+                    <li>
+                        <p>扩展属性值字段</p>
+                        <input class="common-text" type="text" name="av">
+                        <p style="color: #999">多个字段请用&隔开,顺序和扩展属性表的顺序对应</p>
+                    </li>
+                    <li>
+                        <input type="checkbox" name="ex" value="1">此表是扩展属性表
+                    </li>
+                    <li>
+                        <p>每页显示记录数</p>
+                        <input class="common-text" type="text" name="n">
+                    </li>
+                    <li>
+                        <p>表单验证码</p>
+                        <input type="checkbox" name="acap" value="1"><span style="color: #606060">add</span>
+                        <input type="checkbox" name="ecap" value="1"><span style="color: #606060">edit</span>
+                    </li>
+                    <li>
+                        <p>模块</p>
+                        <input class="common-text" type="text" name="module">
+                    </li>
+                    <li>
+                        <p>生成文件</p>
+                        <input type="checkbox" class="f" name="controller" value="1" checked><span style="color: #606060">controller.php</span>
+                        <input type="checkbox" class="f" name="model" value="1" checked><span style="color: #606060">model.php</span>
+                        <input type="checkbox" class="f" name="add" value="1" checked><span style="color: #606060">add.html</span>
+                        <input type="checkbox" class="f" name="index" value="1" checked><span style="color: #606060">index.html</span>
+                        <input type="checkbox" class="f" name="trashcan" value="1" checked><span style="color: #606060">trashcan.html</span>
+                        <input type="checkbox" class="f" name="edit" value="1" checked><span style="color: #606060">edit.html</span>
+                        <input type="checkbox" class="f" name="detail" value="1" checked><span style="color: #606060">detail.html</span>
+                        <input type="checkbox" class="f" name="gallery" value="1" checked><span style="color: #606060">gallery.html</span>
+                        <input type="checkbox" class="f" name="gallerytrashcan" value="1" checked><span style="color: #606060">gallerytrashcan.html</span>
+                        <input type="checkbox" class="f" name="extend" value="1" checked><span style="color: #606060">extend.html</span>
+                        <input type="checkbox" id="all" checked><span style="color: #606060">全选</span>
+                    </li>
+                    <li>
+                        <input class="btn btn-primary btn2" type="submit" value="生成">
+                    </li>
+                </ul>
+            </form>
+        </div>
+    </div>
+</body>
+<script>
+    $("input[name=rec]").click(function() {
+        if($(this).prop("checked")) {
+            $("input[name=ks]").prop("checked", false).prop("disabled", true);
+        } else {
+            $("input[name=ks]").prop("disabled", false);
+        }
+    });
+
+    $("input[name=ti]").click(function() {
+        if($(this).prop("checked")) {
+            $("input[name=tiname]").prop("readonly", true).val("");
+
+            $("input[name=ex]").prop("disabled", true);
+            $("input[name=ext]").prop("readonly", true).val("");
+            $("input[name=at]").prop("readonly", true).val("");
+            $("input[name=av]").prop("readonly", true).val("");
+
+            $("input[name=na]").prop("checked", false).prop("disabled", true);
+        } else {
+            $("input[name=tiname]").prop("readonly", false);
+
+            $("input[name=ex]").prop("disabled", false);
+            $("input[name=ext]").prop("readonly", false);
+            $("input[name=at]").prop("readonly", false);
+            $("input[name=av]").prop("readonly", false);
+
+            $("input[name=na]").prop("disabled", false);
+        }
+    });
+
+    $("input[name=ex]").click(function() {
+        if($(this).prop("checked")) {
+            $("input[name=ext]").prop("readonly", true).val("");
+
+            $("input[name=ti]").prop("disabled", true);
+            $("input[name=tiname]").prop("readonly", true).val("");
+
+            $("input[name=na]").prop("checked", false).prop("disabled", true);
+        } else {
+            $("input[name=ext]").prop("readonly", false);
+
+            $("input[name=ti]").prop("disabled", false);
+            $("input[name=tiname]").prop("readonly", false);
+
+            $("input[name=na]").prop("disabled", false);
+        }
+    });
+
+    var f = $(".f");
+    $("#all").click(function() {
+        if($(this).prop("checked")) {
+            $(f).prop("checked", true);
+        } else {
+            $(f).prop("checked", false);
+        }
+    });
+
+
+    $(f).click(function() {
+        var flag = true;
+        for(var i = 0; i < $(f).length; i++) {
+            flag &= $(f).eq(i).prop("checked");
+        }
+        $("#all").prop("checked", flag);
+    })
+</script>
+</html>

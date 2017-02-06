@@ -1,0 +1,29 @@
+{extends file="Admin/View/Public/layout.html"}
+{block name="main"}
+<div class="crumb-wrap">
+    <div class="crumb-list">
+        <i class="icon-font"></i>
+        <a href="{$smarty.const.__MODULE__}">首页</a>
+        <span class="crumb-step">&gt;</span>
+        <a class="crumb-name" href="{$smarty.const.__CONTROLLER__}/index">{$tcname}管理</a>
+        <span class="crumb-step">&gt;</span>
+        <span class="crumb-name">角色</span>
+    </div>
+</div>
+<div class="result-wrap">
+    <div class="result-content">
+        <div class="result-title">
+            <div class="result-list">
+                <a href="{val(I('get.back'), '{$smarty.const.__CONTROLLER__}/index')}">返回</a>
+            </div>
+        </div>
+    </div>
+    <form action="" name="myform" id="myform" method="post">
+        <input id="_csrf" type="hidden" name="_csrf" value="{$smarty.session.csrf}">
+        {foreach $rData as $v}
+        <input type="checkbox" name="role[]" value="{$v.id}" {if in_array($v.id, $arData)}checked{/if}>{$v.name}<br>
+        {/foreach}
+        <input class="btn btn-primary btn6 mr10" value="保存" type="submit">
+    </form>
+</div>
+{/block}

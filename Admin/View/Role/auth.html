@@ -1,0 +1,59 @@
+{extends file="Admin/View/Public/layout.html"}
+{block name="main"}
+<div class="crumb-wrap">
+    <div class="crumb-list">
+        <i class="icon-font"></i>
+        <a href="{$smarty.const.__MODULE__}">首页</a>
+        <span class="crumb-step">&gt;</span>
+        <a class="crumb-name" href="{$smarty.const.__CONTROLLER__}/index">{$tcname}管理</a>
+        <span class="crumb-step">&gt;</span>
+        <span class="crumb-name">权限</span>
+    </div>
+</div>
+<div class="result-wrap">
+    <div class="result-content">
+        <div class="result-title">
+            <div class="result-list">
+                <a href="{val(I('get.back'), '{$smarty.const.__CONTROLLER__}/index')}">返回</a>
+            </div>
+        </div>
+    </div>
+    <form action="" name="myform" id="myform" method="post">
+        <input id="_csrf" type="hidden" name="_csrf" value="{$smarty.session.csrf}">
+        {foreach $aData as $v}
+        {str_repeat('-', $v.level * 8)}
+        <input type="checkbox" name="auth[]" class="auth" value="{$v.id}" lev="{$v.level}"
+               {if in_array($v.id, $raData)}checked{/if}>{$v.name}<br>
+        {/foreach}
+        <input class="btn btn-primary btn6 mr10" value="保存" type="submit">
+    </form>
+</div>
+<script>
+    $(".auth").click(function() {
+        var lev = $(this).attr("lev");
+        if($(this).prop("checked")) {
+            $(this).nextAll(".auth").each(function(k, v) {
+                if($(v).attr("lev") > lev) {
+                    $(v).prop("checked", true);
+                } else {
+                    return false;
+                }
+            });
+            $(this).prevAll(".auth").each(function(k, v) {
+                if($(v).attr("lev") < lev) {
+                    $(v).prop("checked", true);
+                    lev--;
+                }
+            })
+        } else {
+            $(this).nextAll(".auth").each(function(k, v) {
+                if($(v).attr("lev") > lev) {
+                    $(v).prop("checked", false);
+                } else {
+                    return false;
+                }
+            });
+        }
+    })
+</script>
+{/block}

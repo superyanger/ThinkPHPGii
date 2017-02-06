@@ -1,0 +1,208 @@
+{extends file="Admin/View/Public/layout.html"}
+{block name="main"}
+<div class="crumb-wrap">
+    <div class="crumb-list">
+        <i class="icon-font"></i>
+        <a href="{$smarty.const.__MODULE__}">首页</a>
+        <span class="crumb-step">&gt;</span>
+        <span class="crumb-name">{$tcname}管理</span>
+    </div>
+</div>
+<div class="result-wrap">
+    <form name="myform" id="myform" method="post">
+        <input id="_csrf" type="hidden" name="_csrf" value="{$smarty.session.csrf}">
+        <div class="result-title">
+            <div class="result-list">
+                <a href="{$smarty.const.__CONTROLLER__}/add?back={$smarty.const.__SELF__}"><i class="icon-font"></i>新增</a>
+                <a href="{$smarty.const.__CONTROLLER__}/trashcan?back={$smarty.const.__SELF__}">回收站</a>
+            </div>
+            <div class="result-list">
+                <input type="checkbox" id="all">全选
+                <a href="javascript:" onclick="trashGroup()">批量移到回收站</a>
+            </div>
+        </div>
+        <div class="result-content">
+            <table class="result-tab" width="100%">
+                <tr>
+                    <th width="15"></th>
+                                                                                                                    
+                            <th>名称</th>
+                                                
+                    <th width="30%">操作</th>
+                </tr>
+                {foreach $data as $v}
+                <tr id="row_{$v.id}" class="parent parent_{$v.parent_id}" level="{$v.level}">
+                    <td><input type="checkbox" name="ids[]" value="{$v.id}" class="check-id" onclick="choose({$v.id}, this)"></td>
+                    <td align="left">
+                                                    
+                            {str_repeat('-', $v.level * 8)}
+                            <span class="flip-cat" onclick="flipCat({$v.id}, this)">+</span>
+                                                
+                        {$v.name}
+                    </td>
+                    <td>
+                        <a class="link-update" href="{$smarty.const.__CONTROLLER__}/detail?id={$v.id}&back={$smarty.const.__SELF__}">详情</a>
+                                                                        
+                        <!--自定义action start--><!--自定义action end-->
+                        <a class="link-update" href="{$smarty.const.__CONTROLLER__}/edit?id={$v.id}&back={$smarty.const.__SELF__}">修改</a>
+                        <a class="link-del" href="javascript:" onclick="trash({$v.id}, this)">移到回收站</a>
+                    </td>
+                </tr>
+                {/foreach}
+            </table>
+            <div class="list-page">{$page}</div>
+        </div>
+    </form>
+</div>
+<script>
+    function trash(id, obj)
+    {
+        if(confirm('确定要移到回收站吗')) {
+            $.ajax({
+                method: "POST",
+                url: "{$smarty.const.__CONTROLLER__}/trash",
+                data: {
+                    id: id,
+                    _csrf: $("#_csrf").val()
+                },
+                dataType: "json",
+                success: function(data) {
+                    if(data.status > 0) {
+                        alert("成功");
+                                                
+                        var v = $("#row_" + id).find(".flip-cat");
+                        if($(v).text() == "-") {
+                            flipCat(id, v);
+                        }
+                                                
+                        $(obj).parent().parent().remove();
+                    } else {
+                        alert("网络正在睡觉,请稍后再试");
+                    }
+                    $("#_csrf").val(data.csrf);
+                },
+                error: function(o, s, e) {
+                    alert("网络正在睡觉,请稍后再试");
+                }
+            })
+        }
+    }
+
+    function choose(id, obj)
+    {
+                
+        chooseSubCat(id, obj);
+                
+        $("#all").prop("checked", canChooseAll());
+    }
+
+        
+    function chooseSubCat(id, obj)
+    {
+        var v = $(".parent_" + id);
+        if($(obj).prop("checked")) {
+            $(v).find(".check-id").prop("checked", true);
+            $(v).each(function(k, vv) {
+                var sid = $(vv).attr("id").substr(4);
+                chooseSubCat(sid, $(vv).find(".check-id"));
+            })
+        } else {
+            $(v).find(".check-id").prop("checked", false);
+            $(v).each(function(k, vv) {
+                var sid = $(vv).attr("id").substr(4);
+                chooseSubCat(sid, $(vv).find(".check-id"));
+            });
+            var tr = $(obj).parent().parent();
+            var level = $(tr).attr("level");
+            $(tr).prevAll("tr").each(function(k, vv) {
+                var lev = $(vv).attr("level");
+                if(lev < level) {
+                    $(vv).find(".check-id").prop("checked", false);
+                    level = lev;
+                }
+            })
+        }
+    }
+    
+    function canChooseAll()
+    {
+        var v = $(".check-id");
+        for(var i = 0; i < $(v).length; i++) {
+            if(!$(v).eq(i).prop("checked")) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    $("#all").click(function() {
+        if($(this).prop("checked")) {
+            $(".check-id").prop("checked", true);
+        } else {
+            $(".check-id").prop("checked", false);
+        }
+    });
+
+    function trashGroup()
+    {
+        if(!selectAny()) {
+            alert("没有选择任何行");
+            return;
+        }
+        if(confirm("确定要移到回收站吗")) {
+            $.ajax({
+                method: "POST",
+                url: "{$smarty.const.__CONTROLLER__}/trashgroup",
+                data: $("#myform").serialize(),
+                dataType: "json",
+                success: function(data) {
+                    if(data.status > 0) {
+                        alert("成功");
+                        window.location.reload(true);
+                    } else {
+                        alert("网络正在睡觉,请稍后再试");
+                    }
+                    $("#_csrf").val(data.csrf);
+                },
+                error: function(o, s, e) {
+                    alert("网络正在睡觉,请稍后再试");
+                }
+            })
+        }
+    }
+
+    function selectAny()
+    {
+        var v = $(".check-id");
+        for (var i = 0; i < $(v).length; i++) {
+            if($(v).eq(i).prop("checked")) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+        
+    function flipCat(id, obj)
+    {
+        var v = $(".parent_" + id);
+        if($(obj).text() == "+") {
+            $(v).find(".flip-cat").text("+");
+            $(obj).text("-");
+            $(v).show();
+        } else {
+            $(v).find(".flip-cat").text("-");
+            $(v).each(function(k, vv) {
+                var sid = $(vv).attr("id").substr(4);
+                flipCat(sid, $(vv).find(".flip-cat"));
+            });
+            $(obj).text("+");
+            $(v).hide();
+        }
+    }
+
+    $(".parent").hide();
+    $(".parent_0").show();
+    
+</script>
+{/block}
