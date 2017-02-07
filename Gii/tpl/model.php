@@ -22,13 +22,17 @@ class <?=$cls?>Model extends DYCModel
     <?="\r"?>
         array('<?=$v['field']?>', '1,<?=$matches[1]?>', '<?=$v['comment']?>不能超过<?=$matches[1]?>个字符', 2, 'length'),
     <?php endif;?>
-    <?php if(preg_match('/^.*int\([0-9]+\)( unsigned)?$/', $v['type'])):?>
+    <?php if(contain($v['type'], 'int')):?>
     <?="\r"?>
         array('<?=$v['field']?>', 'number', '<?=$v['comment']?>必须是数字',2),
     <?php endif;?>
-    <?php if(preg_match('/^.*decimal.*( unsigned)?$/', $v['type'])):?>
+    <?php if(preg_match('/^(decimal|float|double)\([0-9]+,2\).*$/', $v['type'])):?>
     <?="\r"?>
         array('<?=$v['field']?>', 'currency', '<?=$v['comment']?>非法输入',2),
+    <?php endif;?>
+    <?php if(preg_match('/^(decimal|float|double).*$/', $v['type']) > 0):?>
+    <?="\r"?>
+        array('<?=$v['field']?>', 'checkDecimal', '<?=$v['comment']?>必须是整数或小数',2,'callback'),
     <?php endif;?>
     <?php if(preg_match('/^.*unsigned$/', $v['type'])):?>
     <?="\r"?>
@@ -57,10 +61,6 @@ class <?=$cls?>Model extends DYCModel
     <?php if($v['field'] == 'idcard'):?>
     <?="\r"?>
         array('<?=$v['field']?>', 'checkIdcard', '<?=$v['comment']?>格式不正确', 2, 'callback'),
-    <?php endif;?>
-    <?php if($v['field'] == 'password'):?>
-    <?="\r"?>
-        array('repassword', 'password', '两次输入的密码不一致', 1, 'confirm'),
     <?php endif;?>
     <?php endforeach;?>
     <?php if(in_array('repassword', $_insertFields)):?>
@@ -406,7 +406,9 @@ class <?=$cls?>Model extends DYCModel
         <?php endif;?>
         <?php if($v['field'] == 'password'):?>
         <?="\r"?>
-        $data['<?=$v['field']?>'] = md5($_POST['<?=$v['field']?>']);
+        if(!empty($_POST['<?=$v['field']?>'])) {
+            $data['<?=$v['field']?>'] = md5($_POST['<?=$v['field']?>']);
+        }
         <?php endif;?>
         <?php endforeach;?>
         <?="\r"?>

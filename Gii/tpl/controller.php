@@ -167,19 +167,20 @@ class <?=$cls?>Controller extends BaseController
 
     public function trashgroup()
     {
-        if(empty(I('post.')) || empty(I('post._csrf')) || I('post._csrf') != session('csrf')) {
-            echo json_encode(array('status' => 0));
+        $csrf = session('csrf');
+        session('csrf', md5(microtime().rand()));
+        if(empty(I('post.')) || empty(I('post._csrf')) || I('post._csrf') != $csrf) {
+            echo json_encode(array('status' => 0, 'csrf' => session('csrf')));
+            return;
         }
-
-        session('csrf', null);
 
         $model = new <?=$cls?>Model();
         $ids = I('post.ids');
         $ids = implode("','", $ids);
         if($model->trash("id in ('{$ids}')") !== false) {
-            echo json_encode(array('status' => 1));
+            echo json_encode(array('status' => 1, 'csrf' => session('csrf')));
         } else {
-            echo json_encode(array('status' => 0));
+            echo json_encode(array('status' => 0, 'csrf' => session('csrf')));
         }
     }
 

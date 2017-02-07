@@ -12,11 +12,11 @@
     <div class="result-wrap">
         <div class="result-title">
             <div class="result-list">
-                <a href="{$smarty.const.__CONTROLLER__}/rabc">生成RABC</a>
+                <a id="rabc" href="javascript:">生成RABC</a>
             </div>
         </div>
         <div class="result-content">
-            <form method="post" action="">
+            <form method="post" action="" id="myform">
                 <input id="csrf" type="hidden" name="_csrf" value="{$smarty.session.csrf}">
                 <ul>
                     <li>
@@ -95,7 +95,7 @@
                         <input type="checkbox" id="all" checked><span style="color: #606060">全选</span>
                     </li>
                     <li>
-                        <input class="btn btn-primary btn2" type="submit" value="生成">
+                        <input id="generate" class="btn btn-primary btn2" type="button" value="生成">
                     </li>
                 </ul>
             </form>
@@ -103,6 +103,44 @@
     </div>
 </body>
 <script>
+    $("#generate").click(function() {
+        $.ajax({
+            method: "POST",
+            url: "{$smarty.const.__CONTROLLER__}/generate",
+            data: $("#myform").serialize(),
+            dataType: "json",
+            success: function(data) {
+                $("#csrf").val(data.csrf);
+                if(data.status > 0) {
+                    alert("成功");
+                } else {
+                    alert("网络正在睡觉");
+                }
+            },
+            error: function(o, s, e) {
+                alert("网络正在睡觉");
+            }
+        })
+    });
+
+    $("#rabc").click(function() {
+        $.ajax({
+            method: "GET",
+            url: "{$smarty.const.__CONTROLLER__}/rabc",
+            dataType: "json",
+            success: function(data) {
+                if(data.status > 0) {
+                    alert("成功");
+                } else {
+                    alert("网络正在睡觉");
+                }
+            },
+            error: function(o, s, e) {
+                alert("网络正在睡觉");
+            }
+        })
+    });
+
     $("input[name=rec]").click(function() {
         if($(this).prop("checked")) {
             $("input[name=ks]").prop("checked", false).prop("disabled", true);
@@ -152,6 +190,15 @@
     });
 
     var f = $(".f");
+    function checkAllSelect()
+    {
+        var flag = true;
+        for(var i = 0; i < $(f).length; i++) {
+            flag &= $(f).eq(i).prop("checked");
+        }
+        return flag;
+    }
+
     $("#all").click(function() {
         if($(this).prop("checked")) {
             $(f).prop("checked", true);
@@ -160,13 +207,9 @@
         }
     });
 
-
     $(f).click(function() {
-        var flag = true;
-        for(var i = 0; i < $(f).length; i++) {
-            flag &= $(f).eq(i).prop("checked");
-        }
+        var flag = checkAllSelect();
         $("#all").prop("checked", flag);
-    })
+    });
 </script>
 </html>

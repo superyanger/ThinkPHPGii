@@ -57,7 +57,7 @@
                             <?="\r"?>
                             </select>
                             <?php endif;?>
-                            <?php elseif($v['type'] == 'text'):?>
+                            <?php elseif(hasSuffix($v['type'], 'text')):?>
                             <?="\r"?>
                             <textarea id="<?=$v['field']?>" name="<?=$v['field']?>">{setValue('<?=$v['field']?>', $data.<?=$v['field']?>)}</textarea>
                             <?php elseif(in_array($v['field'], $fk)):?>

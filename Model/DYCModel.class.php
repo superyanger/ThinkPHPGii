@@ -9,6 +9,16 @@ class DYCModel extends Model
     protected $picAttrs = array(); //存储图片字段
 
     /**
+     * 验证值是否是整数或浮点数
+     * @param string $arg 待验证的值
+     * @return bool true是 false不是
+     */
+    function checkDecimal($arg)
+    {
+        return preg_match('/^[0-9]+(\.[0-9]+)?$/', $arg) > 0;
+    }
+
+    /**
      * 验证值是否为非负数
      * @param string $arg 待验证的值
      * @return bool true非负数 false负数
@@ -104,19 +114,19 @@ class DYCModel extends Model
         $this->deleteIms($this->pics);
     }
 
-    public function add($data)
+    public function add($data, $options=array(), $replace=false)
     {
-        $re = parent::add($data);
+        $re = parent::add($data, $options, $replace);
         if($re === false) {
             $this->deleteIms($this->pics);
         }
         return $re;
     }
 
-    public function save($data, $option = array())
+    public function save($data, $options = array())
     {
-        $re = parent::save($data);
-        $this->deleteIms($this->getNoDBPics($option['where']));
+        $re = parent::save($data, $options);
+        $this->deleteIms($this->getNoDBPics($options['where']));
         return $re;
     }
 
@@ -143,7 +153,7 @@ class DYCModel extends Model
      * @param $where string|array <p>
      * 条件
      * </p>
-     * @return bool
+     * @return bool true成功 false失败
      */
     public function trash($where)
     {
@@ -157,7 +167,7 @@ class DYCModel extends Model
      * @param $where string|array <p>
      * 条件
      * </p>
-     * @return bool
+     * @return bool true成功 false失败
      */
     public function recover($where)
     {
